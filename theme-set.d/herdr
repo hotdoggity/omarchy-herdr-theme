@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Install Omarchy's rendered Herdr palette where Herdr discovers custom themes.
+
+set -euo pipefail
+
+source="$HOME/.local/state/omarchy/current/theme/herdr.json"
+destination="${XDG_CONFIG_HOME:-$HOME/.config}/herdr-app/themes/omarchy.json"
+
+# Themes without colors.toml do not render dynamic templates.
+[[ -f "$source" ]] || exit 0
+
+mkdir -p "$(dirname "$destination")"
+temporary=$(mktemp "${destination}.tmp.XXXXXX")
+trap 'rm -f "$temporary"' EXIT
+cp "$source" "$temporary"
+mv -f "$temporary" "$destination"
+trap - EXIT
